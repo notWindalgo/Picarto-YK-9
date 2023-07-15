@@ -51,9 +51,6 @@ function onMessageHandler (target, context, msg) {
   let messageSplit = msg.split(" ");
   let command = messageSplit[0].toLowerCase();
   let parameters = messageSplit[1];
-  if(!parameters){
-    return;
-  }
   //ignore bot messages
   if (context[0].z) {
     return;
@@ -76,6 +73,9 @@ function onMessageHandler (target, context, msg) {
   switch(command){
     //Song Request
     case "!sr":
+      if(!parameters){
+        break;
+      }
       var videoid = parameters.match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/);
       if(videoid != null) {
          youtubeInfo(videoid[1], target);
