@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <header>
+    <!-- Page Title and CSS  -->
+    <title>YK-9 (The dog robot from My Life as a Teenage Robot)</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <!--  Socket.io and jquery libraries are loaded -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="jquery-3.5.1.min.js"></script>
+  </header>
+
+  <body>
+
+    <!-- Now Playing: Song Title -->
+    <div id="songtitle">Song Title</div>
+    <!-- Youtube Player is injected here -->
+    <div id="player"></div>
+    <!-- Playlist -->
+    <div class="playlistcontainer">
+      <div class="playlist">
+        <table class="styled-table">
+          <thead>
+              <tr>
+                  <th> </th>
+                  <th>Title</th>
+                  <th>Length</th>
+                  <th>Submitted By</th>
+              </tr>
+          </thead>
+          <tbody id="playlist">
+              <!-- Playlist is injected here -->
+          </tbody>
+      </table>
+      </div>
+    </div>
+
+    <!-- Script functions  -->
+    <script>
+      //Load socket and force websocket connection
+      var socket = io.connect("",{
+        'forceNew': true,
+        'transports': ['websocket'],
+        'upgrade': false
+      });
+      //Create playList array to be replaced by node script
+      var playList = [];
+      //Call youtube API and build player
+      var tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: playList[0],
+          playerVars: {
+            'playsinline': 1,
+            'origin': 'https://www.youtube.com'
+          },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
+            'onError': onPlayerError
+          }
+        });
+      }
+      //On ready, attempt to play video (will always error before playlist is loaded, but keeps page spaced correctly)
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+
+      //When a video ends
+      function onPlayerStateChange(event) {
+        //If video ended
+        if (event.data == 0) {
+          nextVideo();
+        }
+      }
+      //On player error
+      function onPlayerError(event){
+        //if there's no video loaded, load the playlist
+        if (event.data == 2){
+          if(playList[0]){
+            player.loadVideoById(playList[0][0]);
+          }
+        }
+        //if the error is due to a video, skip and play next
+        else{
+          nextVideo()
+        }
+      }
+
+      function nextVideo() {
+        playList.shift();
+        socket.emit("playListUpdate", playList);
+        player.loadVideoById(playList[0][0]);
+        updatePage();
+      }
+
+      //Socket events
+      socket.on('connect', () => {
+        socket.emit("updatePlayList");
+      });
+
+      socket.on('updatePL', function(pL) {
+        playList = pL;
+        updatePage();
+        let state = player.getPlayerState();
+        if(playList.length == 1 || !state){
+          player.loadVideoById(playList[0][0]);
+        }
+      });
+
+      socket.on('skipSong', function() {
+        dropSong(0);
+      });
+
+      function updatePage(){
+        let list = document.getElementById("playlist");
+        if(playList[0]){
+          document.getElementById("songtitle").innerHTML = playList[0][1];
+          list.innerHTML = "";
+          for(var i = 0; i < playList.length; i++){
+            list.innerHTML += '<tr><td><i style="cursor: pointer" onclick="dropSong('+ i +')" class="fa fa-trash-o" aria-hidden="true"></i></td><td>' + playList[i][1] + "</td><td>" + playList[i][2] + "</td><td>" + playList[i][3] + "</tr></td>"
+          }
+        }
+        else{
+          document.getElementById("songtitle").innerHTML = "No Song Queued";
+          list.innerHTML = "";
+        }
+      }
+      function dropSong(i){
+        playList.splice(i, 1);
+        socket.emit("playListUpdate", playList);
+        if(i == 0){
+          player.stopVideo();
+          if(playList[0]){
+            player.loadVideoById(playList[0][0]);
+          }
+          else{
+            player.loadVideoById("");
+          }
+        }
+        updatePage();
+      }
+    </script>
+  </body>
+</html>
