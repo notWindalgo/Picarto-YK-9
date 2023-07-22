@@ -1,0 +1,5 @@
+Added login screen</br>
+-Oauth authentication</br>
+-Accessible information blocks</br>
+Added application logo and icon</br>
+Added local files for update and information texts

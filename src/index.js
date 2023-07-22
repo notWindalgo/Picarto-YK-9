@@ -5,6 +5,7 @@ if (require('electron-squirrel-startup')) app.quit();
 let mainWindow;
 app.on('ready', function() {
   mainWindow = new BrowserWindow({
+    icon: "./src/public/icon.ico",
     width: 700,
     height: 1000,
     autoHideMenuBar: true,

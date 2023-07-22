@@ -1,0 +1,13 @@
+YK-9 is a standalone application that allows song requests from your Picarto.tv chat</br>
+</br>
+Your <b>Username</b> must match your Picarto account name</br>
+Your <b>Oauth</b> token must be generated from <a href="https://oauth.picarto.tv/chat/bot" target="_blank">this link</a> (https://oauth.picarto.tv/chat/bot)</br>
+</br>
+Commands:</br>
+!sr &#60;link&#62;: Adds a youtube link to the playlist queue</br>
+!skip: Skips the current song in the playlist</br>
+</br>
+</br>
+Links:</br>
+Github: https://github.com/notWindalgo/Picarto-YK-9</br>
+Support: https://ko-fi.com/windalgo

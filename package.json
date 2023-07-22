@@ -1,7 +1,7 @@
 {
   "name": "yk-9",
   "productName": "yk-9",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Electron app to act as a Picarto.tv music bot",
   "main": "src/index.js",
   "build": {
@@ -24,7 +24,7 @@
     "http": "^0.0.1-security",
     "pmi.js": "^1.0.4",
     "socket.io": "^4.7.1",
-    "ytdl-core": "^4.11.4"
+    "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.2.1",

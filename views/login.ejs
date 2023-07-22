@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <header>
+    <!-- Page Title and CSS  -->
+    <title>YK-9 (The dog robot from My Life as a Teenage Robot)</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <!--  Socket.io and jquery libraries are loaded -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="jquery-3.5.1.min.js"></script>
+  </header>
+  <body>
+    <img id="logo" src="yk9logo.png">
+    <div id="login">
+      <h8>LOGIN</h8>
+      Username:</br><i class="fa fa-user" aria-hidden="true"></i> <input type="text" spellcheck="false" id="name" value="<%= cred.username %>"><br>
+      Oauth:</br><i class="fa fa-unlock-alt" aria-hidden="true"></i> <input type="password" spellcheck="false" id="oauth" value="<%= cred.token %>"><br>
+      <input type="submit" value="Login" style="cursor: pointer; margin-top:10px; width:45px" onClick="login()"></input>
+    </div>
+
+    <div id="errortext">ERROR: Login failed, please assure username and oauth are correct</div>
+
+    <div id="login" class="about" style="margin-top:3px;">
+      <h8>YK-9</h8>
+      <div id="about">
+        <%- about %>
+      </div>
+    </div>
+
+    <div id="login" class="update" style="margin-top:15px;">
+      <h8>UPDATE</h8>
+      <div id="update">
+        <h9><%= ver.version %>  <%= ver.date %></h9>
+        <%- update %>
+      </div>
+    </div>
+
+    <div id="verFooter" class="footer">
+      YK-9 <%= ver.version %> || Developed by Windalgo
+    </div>
+
+    <!-- Script functions  -->
+    <script>
+      //Load socket and force websocket connection
+      var socket = io.connect("",{
+        'forceNew': true,
+        'transports': ['websocket'],
+        'upgrade': false
+      });
+
+      //Socket events
+      socket.on('connect', () => {
+      });
+      socket.on('logged', () => {
+        window.location.href = "/connected";
+      });
+      socket.on('failed', () => {
+        document.getElementById("errortext").classList.add("error");
+      });
+
+      function login(){
+        var login = [];
+        login.push(document.getElementById("name").value);
+        login.push(document.getElementById("oauth").value);
+        socket.emit("login", login);
+      }
+
+    </script>
+  </body>
+</html>

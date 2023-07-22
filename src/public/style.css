@@ -5,6 +5,94 @@ body  {
   width: 640px;
 }
 
+input{
+  background-color: rgb(255, 255, 255, 0.35);
+  border: none;
+  padding-left: 5px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+input:focus{
+  outline-style: none;
+}
+
+#logo{
+  margin-top: 25px;
+  margin-bottom: 50px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#login{
+  font-family: Verdana, sans-serif;
+  width:100%;
+  text-align: left;
+  font-size: 0.8em;
+  padding: 10px;
+  background: rgb(27, 32, 41, 0.85);
+  color: #fff;
+  box-sizing: border-box;
+}
+
+#login i{
+  padding-right:3px;
+}
+
+/* Block titles */
+#login h8{
+  letter-spacing: 4px;
+  display: block;
+  padding-bottom: 8px;
+}
+#login h8::first-letter{
+  font-size:1.3em;
+}
+/* Block subtitles */
+#login h9{
+  font-size:0.6em;
+  display: block;
+  margin-top: -8px;
+  padding-bottom: 8px;
+}
+
+#verFooter{
+  color: white;
+  font-size: 0.6em;
+  opacity: 40%;
+  bottom: 0px;
+  position: fixed;
+  /* No Select */
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+a {
+  color: #0388fc;
+}
+
+#errortext{
+  opacity: 0%;
+  font-weight:bold;
+  font-size: 0.8em;
+  padding-left: 20%;
+  /* No Select */
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.error{
+  animation-name: error;
+  animation-duration: 7s;
+}
+@keyframes error {
+  0% { color: #ff0000; opacity: 100%;}
+  100% { color: #b84d4d;}
+  50% { color: #b84d4d; opacity: 100%;}
+  100% { color: #b84d4d; opacity: 0%;}
+}
 
 #songtitle{
   font-family: Verdana, sans-serif;

@@ -2,19 +2,7 @@ var fs = require('fs');
 //Picarto Messanger Interface
 const pmi = require('pmi.js');
 
-//read creds from file that does not get merged into electron app
-let credPath = (__dirname + '/cred.json');
-var cred = JSON.parse(fs.readFileSync(credPath));
-
-//Picarto login details
-const opts = {
-  identity: {
-    username: cred.username,
-    password: cred.token
-  }
-};
-
-//establish Express constants and websocket
+//Establish express constants and websocket
 const port = 80;
 const express = require('express');
 const app = express()
@@ -23,18 +11,21 @@ const io = require('socket.io')(http);
 
 //ytdl for video titles
 const ytdl = require('ytdl-core');
-//
+//load saved song playlist
 let playlistPath = (__dirname + '/playlist.json');
 var playList = JSON.parse(fs.readFileSync(playlistPath));
 
-//create Picarto client
-const client = new pmi.client(opts);
-//client events
-client.on('message', onMessageHandler);
-client.on('connected', onConnectedHandler);
-client.on('closed', onClosedHandler);
-//connecct client
-client.connect();
+//Get text blocks
+let aboutPath = (__dirname + '/about.txt');
+var about = fs.readFileSync(aboutPath, {encoding: 'utf8'});
+let updatePath = (__dirname + '/update.txt');
+var update = fs.readFileSync(updatePath, {encoding: 'utf8'});
+//Version
+let verPath = (__dirname + '/ver.json');
+var ver = JSON.parse(fs.readFileSync(verPath));
+
+//Establish pmi client to replace
+var client;
 
 //public folder for css and favicon
 app.use(express.static(__dirname + '/public'));
@@ -42,8 +33,66 @@ app.set('view engine', 'ejs')
 
 //Listen to root URL, render index.ejs on it
 app.get('/', function (req, res) {
-  res.render('index.ejs');
+  //Send saved creds for quick login
+  let credPath = (__dirname + '/cred.json');
+  let cred = JSON.parse(fs.readFileSync(credPath));
+
+  res.render('login.ejs', {cred: cred, about: about, update: update, ver: ver});
 })
+//Listen to connected URL, render index.ejs on it
+app.get('/connected', function (req, res) {
+  res.render('index.ejs', {ver: ver});
+})
+
+//On websocket connection
+io.on('connection', (socket) => {
+  socket.on('login', (login) => {
+    //write new login information to file
+    let credPath = (__dirname + '/cred.json');
+    let data = JSON.stringify({username: login[0], token: login[1]});
+    fs.writeFileSync(credPath, data);
+
+    //attempt login
+    let opts = {
+      identity: {
+        username: login[0],
+        password: login[1]
+      }
+    };
+    //create Picarto client
+    client = new pmi.client(opts);
+    client.on('connected', onConnectedHandler);
+    client.on('unauthenticated', onFailedHandler);
+    client.on('message', onMessageHandler);
+    //connecct client
+    client.connect();
+  });
+
+  //socket sends playlist
+  socket.on('playListUpdate', (pL) => {
+    playList = pL;
+    writePlayList(playList);
+  });
+  //socket requests playlist
+  socket.on('updatePlayList', () => {
+    io.emit('updatePL', playList);
+  });
+});
+
+//Picarto events
+function onConnectedHandler (addr, port) {
+  //login successful
+  io.emit('logged');
+}
+function onClosedHandler (){
+  //automatic reconnect
+  client.connect();
+}
+function onFailedHandler(){
+  //login failed
+  io.emit('failed');
+  client.close();
+}
 
 //On Picarto message
 function onMessageHandler (target, context, msg) {
@@ -85,31 +134,20 @@ function onMessageHandler (target, context, msg) {
     break;
   }
 }
-function onConnectedHandler (addr, port) {
-    console.log(`* Connected to ${addr}`);
-}
-function onClosedHandler (){
-  client.connect();
-}
-
-//On websocket connection
-io.on('connection', (socket) => {
-  //socket sends playlist
-  socket.on('playListUpdate', (pL) => {
-    playList = pL;
-    writePlayList(playList);
-  });
-  //socket requests playlist
-  socket.on('updatePlayList', () => {
-    io.emit('updatePL', playList);
-  });
-});
 
 //Start web page on selected port
 http.listen(port, () => {
   console.log(`Socket.IO server running on port ${port}/`);
 });
 
+//write playlist to json
+function writePlayList(pL){
+  let playlistPath = (__dirname + '/playlist.json');
+  let data = JSON.stringify(pL);
+  fs.writeFileSync(playlistPath, data);
+}
+
+//Get youtube information
 function youtubeInfo(input, target){
   let newItem = [];
   ytdl.getInfo('https://www.youtube.com/watch?v=' + input)
@@ -127,14 +165,6 @@ function youtubeInfo(input, target){
     })
     .catch(err => client.say(target, "Video is unavailable"));
 }
-
-//write to json
-function writePlayList(pL){
-  let playlistPath = (__dirname + '/playlist.json');
-  let data = JSON.stringify(pL);
-  fs.writeFileSync(playlistPath, data);
-}
-
 //convert youtube length from seconds to minutes
 function convertLength(x){
   if(x < 60){
