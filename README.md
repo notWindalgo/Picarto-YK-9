@@ -1,6 +1,7 @@
 # YK-9
 <img align="right" src="https://i.imgur.com/iHbyj5O.png" width=10%>
 YK-9 is a standalone application that allows song requests from your Picarto.tv chat
+Log in with your Picarto.tv username and generated Oauth token
 
 ## Commands
 | Command | Description
