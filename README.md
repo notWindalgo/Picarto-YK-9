@@ -1,7 +1,6 @@
 # YK-9
-YK-9 is a standalone application that allows song requests from your Picarto.tv chat
-
 <img align="right" src="https://i.imgur.com/iHbyj5O.png" width=10%>
+YK-9 is a standalone application that allows song requests from your Picarto.tv chat
 
 ## Commands
 | Command | Description
