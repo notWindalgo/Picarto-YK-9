@@ -14,9 +14,11 @@
     <img id="logo" src="yk9logo.png">
     <div id="login">
       <h8>LOGIN</h8>
-      Username:</br><i class="fa fa-user" aria-hidden="true"></i> <input type="text" spellcheck="false" id="name" value="<%= cred.username %>"><br>
-      Oauth:</br><i class="fa fa-unlock-alt" aria-hidden="true"></i> <input type="password" spellcheck="false" id="oauth" value="<%= cred.token %>"><br>
-      <input type="submit" value="Login" style="cursor: pointer; margin-top:10px; width:45px" onClick="login()"></input>
+      <form>
+        Username:</br><i class="fa fa-user" aria-hidden="true"></i> <input type="text" spellcheck="false" id="name" value="<%= cred.username %>"><br>
+        Oauth:</br><i class="fa fa-unlock-alt" aria-hidden="true"></i> <input type="password" spellcheck="false" id="oauth" value="<%= cred.token %>"><br>
+        <input type="submit" value="Login" style="cursor: pointer; margin-top:10px; width:45px" onClick="login()"></input>
+      </form>
     </div>
 
     <div id="errortext">ERROR: Login failed, please assure username and oauth are correct</div>
